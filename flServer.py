@@ -1,6 +1,6 @@
 from distutils.log import debug
-from flask import Flask, render_template, request, redirect, jsonify
-from flask_cors import CORS
+from flask import Flask, render_template, request, redirect, jsonify, send_from_directory
+from flask_cors import CORS, cross_origin
 from flask_pymongo import PyMongo
 from encrypt import customEncrypt
 from databaseImplementation import database
@@ -10,7 +10,7 @@ import random
 import sys
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder = 'project/build')
 CORS(app)
 currentUserId = ""
 client = PyMongo(app, uri="mongodb+srv://tester:helloworld@cluster0.wsoqa.mongodb.net/project?retryWrites=true&w=majority")
@@ -21,14 +21,22 @@ userCollec = db.users
 
 dbVar = database()
 
+@app.route('/')
+@cross_origin()
+def index():
+    return send_from_directory( app.static_folder, 'index.html')
+
 
 @app.route("/people")
+@cross_origin()
 def users():
     return {"users": ["jason", "john ", "jose"]}
 
 
 
+
 @app.route("/apiaccess", methods=["POST", "GET"])
+@cross_origin()
 def scrapData():
     given = request.get_json()
     link1 = given['link1']
@@ -57,6 +65,7 @@ def scrapData():
 
 
 @app.route("/logcheck", methods=["POST", "GET"])
+@cross_origin()
 def checker():
     given = request.get_json()
     usernameParam = given['username']
@@ -86,6 +95,7 @@ def checker():
 
 
 @app.route("/adduser", methods=["POST", "GET"])  # get and post
+@cross_origin()
 def addPerson():
     given = request.get_json()
     usernameParam = given['username']
@@ -129,6 +139,7 @@ def addPerson():
 
 
 @app.route("/projecting", methods=["POST", "GET"])
+@cross_origin()
 def projActions():
     #this endpoint will add a project
     # name: projName,
@@ -149,6 +160,7 @@ def projActions():
     
 
 @app.route("/checkProj", methods=["POST", "GET"])
+@cross_origin()
 def checkerProj():
     given = request.get_json()
     ids = given["id"]
@@ -162,6 +174,7 @@ def checkerProj():
 
 
 @app.route("/bigloader", methods=["POST", "GET"])
+@cross_origin()
 def loading():
     given = request.get_json()
     ids = given["id"]
@@ -175,6 +188,7 @@ def loading():
     return responseFromDb
 
 @app.route("/inorout", methods=["POST", "GET"])
+@cross_origin()
 def movesets():
     given = request.get_json()
     qty = given['qty']
